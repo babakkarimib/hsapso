@@ -94,11 +94,12 @@ fn main() {
     println!();
     serde_json::to_writer(File::create("./config.json").unwrap(), &config).unwrap();
     
-    let start = SystemTime::now();
-    println!("Start: {}\n", format_rfc3339(start));
     let mut sum =  0;
     let mut best = usize::MAX;
     let mut best_harmony: Harmony = Harmony::new(config.p_num, config.p_values, config.t_value, print_map);
+    
+    let start = SystemTime::now();
+    println!("Start: {}\n", format_rfc3339(start));
     for i in 0..rep {
         let harmony = hsaga(
             config.p_num,
@@ -116,9 +117,9 @@ fn main() {
             best_harmony = harmony;
         }
     }
-    
     let end = SystemTime::now();
     let duration = format_duration(end.duration_since(start).unwrap()).to_string();
+
     println!("\nBest Harmony:");
     for (i, (h, w)) in best_harmony.test_suite.iter().zip(best_harmony.weight_list.iter()).enumerate() {
         println!("{:2}: {:?}, weight: {}", i + 1, h, w);

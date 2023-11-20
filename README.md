@@ -1,4 +1,4 @@
-Generating minimum CA by combining novel approaches to Harmony Search Algorithm and PSO implemented in Rust.<br>
+Generating minimum CA by combining novel approaches to Harmony Search Algorithm and PSO implemented in Rust programming language.<br>
 More info on the subject matter: https://ieeexplore.ieee.org/document/9729719
 ### How to Compile & Run:
 - Install rust (Linux or macOS):<br>
