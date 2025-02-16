@@ -4,6 +4,8 @@ use dialoguer::Input;
 use humantime::{format_rfc3339, format_duration};
 use std::fs::File;
 use serde_json;
+use rayon::prelude::*;
+use std::sync::{Arc, Mutex};
 
 mod harmony;
 mod config;
@@ -94,13 +96,14 @@ fn main() {
     println!();
     serde_json::to_writer(File::create("./config.json").unwrap(), &config).unwrap();
     
-    let mut sum =  0;
-    let mut best = usize::MAX;
-    let mut best_harmony: Harmony = Harmony::new(config.p_num, config.p_values, config.t_value, print_map);
+    let best_harmony = Arc::new(Mutex::new(Harmony::new(config.p_num, config.p_values, config.t_value, print_map)));
+    let best = Arc::new(Mutex::new(i32::MAX));
+    let sum = Arc::new(Mutex::new(0));
     
     let start = SystemTime::now();
     println!("Start: {}\n", format_rfc3339(start));
-    for i in 0..rep {
+    
+    (0..rep).into_par_iter().for_each(|i| {
         let harmony = hsaga(
             config.p_num,
             config.p_values,
@@ -108,17 +111,24 @@ fn main() {
             config.harmony_size,
             full_coverage,
             config.adjust_rate,
-            print_map
+            print_map,
         );
         println!("TEST {} DONE - SIZE: {}", i + 1, harmony.size);
-        sum += harmony.size;
-        if harmony.size < best {
-            best = harmony.size;
-            best_harmony = harmony;
+    
+        let mut sum_lock = sum.lock().unwrap();
+        *sum_lock += harmony.size;
+        drop(sum_lock);
+    
+        let mut best_lock = best.lock().unwrap();
+        if harmony.size < (*best_lock).try_into().unwrap() {
+            *best_lock = harmony.size as i32;
+            *best_harmony.lock().unwrap() = harmony;
         }
-    }
+    });
     let end = SystemTime::now();
     let duration = format_duration(end.duration_since(start).unwrap()).to_string();
+    let avg_size = *sum.lock().unwrap() as f64 / rep as f64;
+    let best_harmony = best_harmony.lock().unwrap();
 
     println!("\nBest Harmony:");
     for (i, (h, w)) in best_harmony.test_suite.iter().zip(best_harmony.weight_list.iter()).enumerate() {
@@ -132,7 +142,7 @@ fn main() {
     }
     println!();
     println!("Best Size: {}", best_harmony.size);
-    println!("Average Size: {}", sum as f64 / rep as f64);
+    println!("Average Size: {}", avg_size);
     println!("Total Fitness: {}", best_harmony.fitness);
     println!("Full Coverage Fitness: {}", full_coverage);
     println!("Exhaustive: {}\n", config.p_values.pow(config.p_num as u32));
