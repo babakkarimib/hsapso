@@ -33,12 +33,12 @@ impl Harmony {
 
     fn create_test_case(&self) -> Vec<usize> {
         (0..self.p_num)
-            .map(|_| rand::thread_rng().gen_range(0..self.p_values))
+            .map(|_| rand::rng().random_range(0..self.p_values))
             .collect::<Vec<usize>>()
     }
 
     pub fn get_random_test_case(&self) -> &Vec<usize> {
-        &self.test_suite[rand::thread_rng().gen_range(0..self.size)]
+        &self.test_suite[rand::rng().random_range(0..self.size)]
     }
 
     pub fn add_test_case(&mut self, test_case: Vec<usize>) {
@@ -77,7 +77,7 @@ impl Harmony {
     }
 
     pub fn randomized_clone(&mut self) -> Harmony {
-        let index = rand::thread_rng().gen_range(0..self.size);
+        let index = rand::rng().random_range(0..self.size);
         let mut copy = Harmony::new(self.p_num, self.p_values, self.t_value, self.print_map);
 
         for i in 0..self.size {

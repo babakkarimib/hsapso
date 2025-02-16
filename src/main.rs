@@ -21,8 +21,6 @@ fn hsaga(
     adjust_rate: f64,
     print_map: bool
 ) -> Harmony {
-    let mut rng = rand::thread_rng();
-
     let mut harmonies = vec![];
     for _ in 0..harmony_size {
         let mut harmony = Harmony::new(p_num, p_values, t_value, print_map);
@@ -32,13 +30,13 @@ fn hsaga(
 
     loop {
         let best_harmony = harmonies[0].clone();
-        if rng.gen::<f64>() < adjust_rate {
-            let harmony = &mut harmonies[rand::thread_rng().gen_range(0..harmony_size)];
+        if rand::rng().random::<f64>() < adjust_rate {
+            let harmony = &mut harmonies[rand::rng().random_range(0..harmony_size)];
             let c1 = 0.7;
             let c2= 0.7;
             let current_particle = harmony.get_random_test_case();
-            let r1 = rand::thread_rng().gen::<f64>();
-            let r2 = rand::thread_rng().gen::<f64>();
+            let r1 = rand::rng().random::<f64>();
+            let r2 = rand::rng().random::<f64>();
             let w = 0.9;
         
             let mut new_test_case = Vec::with_capacity(p_num);
@@ -53,7 +51,7 @@ fn hsaga(
         
             harmony.add_test_case(new_test_case);
         } else {
-            harmonies[harmony_size - 1] = harmonies[rand::thread_rng().gen_range(0..harmony_size)].randomized_clone();
+            harmonies[harmony_size - 1] = harmonies[rand::rng().random_range(0..harmony_size)].randomized_clone();
         }
         
         harmonies.sort();
@@ -88,7 +86,7 @@ fn main() {
     config.t_value = get_input("Enter t_value", config.t_value);
     config.harmony_size = get_input("Enter harmony_size", config.harmony_size);
     config.adjust_rate = get_input("Enter adjust_rate", config.adjust_rate);
-    let rep = get_input("Enter repetitions", 50);
+    let rep = get_input("Enter repetitions", 100);
     let print_map = get_input("Print coverage map", false);
 
     let full_coverage = combination(config.p_num, config.t_value) * (config.p_values).pow(config.t_value as u32);
