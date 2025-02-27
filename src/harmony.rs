@@ -86,7 +86,10 @@ impl Harmony {
         copy
     }
 
-    pub fn pso(&self, current_particle: Vec<usize>, last_particle: Vec<usize>, best_particle: Vec<usize>) -> Vec<usize> {
+    pub fn pso(&self, best_particle: Vec<usize>) -> Vec<usize> {
+        let current_particle = self.get_random_test_case();
+        let last_particle = self.test_suite[self.size - 1].clone();
+
         let c1 = 0.7;
         let c2= 0.7;
         let r1 = rand::rng().random::<f64>();
