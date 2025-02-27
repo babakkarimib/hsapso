@@ -1,4 +1,4 @@
-use std::time::SystemTime;
+use std::{cmp::min, time::SystemTime};
 use rand::Rng;
 use dialoguer::Input;
 use humantime::{format_rfc3339, format_duration};
@@ -32,26 +32,18 @@ fn hsaga(
         let best_harmony = harmonies[0].clone();
         if rand::rng().random::<f64>() < adjust_rate {
             let harmony = &mut harmonies[rand::rng().random_range(0..harmony_size)];
-            let c1 = 0.7;
-            let c2= 0.7;
             let current_particle = harmony.get_random_test_case();
-            let r1 = rand::rng().random::<f64>();
-            let r2 = rand::rng().random::<f64>();
-            let w = 0.9;
-        
-            let mut new_test_case = Vec::with_capacity(p_num);
-            for i in 0..p_num {
-                let original_value = current_particle[i];
-                let cognitive_velocity = w * c1 * r1 * (harmony.test_suite[0][i] as f64 - original_value as f64);
-                let social_velocity = w * c2 * r2 * (best_harmony.test_suite[0][i] as f64 - original_value as f64);
-                let new_value = (original_value as f64 + cognitive_velocity + social_velocity)
-                    .clamp(0.0, p_values as f64 - 1.0) as usize;
-                new_test_case.push(new_value);
-            }
+            let last_particle = harmony.test_suite[harmony.size - 1].clone();
+            let best_particle = best_harmony.test_suite[min(harmony.size, best_harmony.size) - 1].clone();
+
+            let new_test_case = harmony.pso(current_particle, last_particle, best_particle);
         
             harmony.add_test_case(new_test_case);
         } else {
-            harmonies[harmony_size - 1] = harmonies[rand::rng().random_range(0..harmony_size)].randomized_clone();
+            let random_harmony = harmonies[rand::rng().random_range(0..harmony_size)].randomized_clone();
+            if random_harmony < harmonies[harmony_size - 1] {
+                harmonies[harmony_size - 1] = random_harmony;
+            } 
         }
         
         harmonies.sort();
@@ -86,7 +78,7 @@ fn main() {
     config.t_value = get_input("Enter t_value", config.t_value);
     config.harmony_size = get_input("Enter harmony_size", config.harmony_size);
     config.adjust_rate = get_input("Enter adjust_rate", config.adjust_rate);
-    let rep = get_input("Enter repetitions", 100);
+    let rep = get_input("Enter repetitions", 10);
     let print_map = get_input("Print coverage map", false);
 
     let full_coverage = combination(config.p_num, config.t_value) * (config.p_values).pow(config.t_value as u32);

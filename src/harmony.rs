@@ -37,8 +37,8 @@ impl Harmony {
             .collect::<Vec<usize>>()
     }
 
-    pub fn get_random_test_case(&self) -> &Vec<usize> {
-        &self.test_suite[rand::rng().random_range(0..self.size)]
+    pub fn get_random_test_case(&self) -> Vec<usize> {
+        self.test_suite[rand::rng().random_range(0..self.size)].clone()
     }
 
     pub fn add_test_case(&mut self, test_case: Vec<usize>) {
@@ -84,6 +84,26 @@ impl Harmony {
             copy.add_test_case(if i == index {self.create_test_case()} else {self.test_suite[i].to_vec()});
         }
         copy
+    }
+
+    pub fn pso(&self, current_particle: Vec<usize>, last_particle: Vec<usize>, best_particle: Vec<usize>) -> Vec<usize> {
+        let c1 = 0.7;
+        let c2= 0.7;
+        let r1 = rand::rng().random::<f64>();
+        let r2 = rand::rng().random::<f64>();
+        let w = 0.9;
+    
+        let mut new_test_case = Vec::with_capacity(self.p_num);
+        for i in 0..self.p_num {
+            let original_value = current_particle[i];
+            let cognitive_velocity = w * c1 * r1 * (last_particle[i] as f64 - original_value as f64);
+            let social_velocity = w * c2 * r2 * (best_particle[i] as f64 - original_value as f64);
+            let new_value = (original_value as f64 + cognitive_velocity + social_velocity)
+                .clamp(0.0, self.p_values as f64 - 1.0) as usize;
+            new_test_case.push(new_value);
+        }
+
+        new_test_case
     }
 
     fn cover_map_matrix(p_num: usize, p_values: usize, t_value: usize) -> (Vec<Vec<usize>>, Vec<Vec<usize>>) {
