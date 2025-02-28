@@ -80,7 +80,11 @@ impl Harmony {
         let index = rand::rng().random_range(0..self.size);
         let mut copy = Harmony::new(self.p_num, self.p_values, self.t_value, self.print_map);
 
-        for i in 0..self.size {
+        let indices: Vec<usize> = (0..self.size)
+            .sorted_by_key(|&i| std::cmp::Reverse(self.weight_list[i]))
+            .collect();
+
+        for i in indices {
             copy.add_test_case(if i == index {self.create_test_case()} else {self.test_suite[i].to_vec()});
         }
         copy

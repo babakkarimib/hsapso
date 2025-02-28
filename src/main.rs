@@ -76,7 +76,7 @@ fn main() {
     config.t_value = get_input("Enter t_value", config.t_value);
     config.harmony_size = get_input("Enter harmony_size", config.harmony_size);
     config.adjust_rate = get_input("Enter adjust_rate", config.adjust_rate);
-    let rep = get_input("Enter repetitions", 11);
+    let rep = get_input("Enter repetitions", 8);
     let print_map = get_input("Print coverage map", false);
 
     let full_coverage = combination(config.p_num, config.t_value) * (config.p_values).pow(config.t_value as u32);
