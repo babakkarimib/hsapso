@@ -22,23 +22,10 @@ impl Harmony {
 
     pub fn init(&mut self) {
         let test_case = self.create_test_case();
-
         self.weight_list = vec![self.check_test_case(&test_case, true)];
         self.fitness = self.weight_list[0];
-
         self.size = 1;
-
         self.test_suite.push(test_case);
-    }
-
-    fn create_test_case(&self) -> Vec<usize> {
-        (0..self.p_num)
-            .map(|_| rand::rng().random_range(0..self.p_values))
-            .collect::<Vec<usize>>()
-    }
-
-    pub fn get_random_test_case(&self) -> Vec<usize> {
-        self.test_suite[rand::rng().random_range(0..self.size)].clone()
     }
 
     pub fn add_test_case(&mut self, test_case: Vec<usize>) {
@@ -52,41 +39,18 @@ impl Harmony {
         self.test_suite.push(test_case);
     }
 
-    pub fn check_against(&mut self, test_case: &Vec<usize>) -> usize {
-        self.check_test_case(test_case, false)
-    }
-    
-    fn check_test_case(&mut self, test_case: &Vec<usize>, mark: bool) -> usize {
-        let mut weight = 0;
-
-        self.ca_map.iter_mut().enumerate().for_each(|(i, ca_row)| {
-            let test = self.comb_indices[i]
-                .iter()
-                .map(|&index| test_case[index].to_string())
-                .collect::<String>();
-            let decimal_number = usize::from_str_radix(&test, self.p_values as u32).unwrap() as usize;
-            
-            if ca_row[decimal_number] == 0 {
-                if mark {
-                    ca_row[decimal_number] = if self.print_map {self.size as usize + 1} else {1};
-                }
-                weight += 1;
-            }
-        });
-        weight
-    }
-
     pub fn randomized_clone(&mut self) -> Harmony {
-        let index = rand::rng().random_range(0..self.size);
         let mut copy = Harmony::new(self.p_num, self.p_values, self.t_value, self.print_map);
 
-        let indices: Vec<usize> = (0..self.size)
+        let weight_indices: Vec<usize> = (0..self.size)
             .sorted_by_key(|&i| std::cmp::Reverse(self.weight_list[i]))
             .collect();
+        let random_index = rand::rng().random_range(0..self.size);
 
-        for i in indices {
-            copy.add_test_case(if i == index {self.create_test_case()} else {self.test_suite[i].to_vec()});
+        for i in weight_indices {
+            copy.add_test_case(if i == random_index {self.create_test_case()} else {self.test_suite[i].to_vec()});
         }
+
         copy
     }
 
@@ -126,6 +90,41 @@ impl Harmony {
         let ca_map = vec![vec![0; (p_values as usize).pow(t_value as u32)]; comb_indices.len()];
     
         (comb_indices, ca_map)
+    }
+
+    fn create_test_case(&self) -> Vec<usize> {
+        (0..self.p_num)
+            .map(|_| rand::rng().random_range(0..self.p_values))
+            .collect::<Vec<usize>>()
+    }
+
+    fn get_random_test_case(&self) -> Vec<usize> {
+        self.test_suite[rand::rng().random_range(0..self.size)].clone()
+    }
+
+    fn check_against(&mut self, test_case: &Vec<usize>) -> usize {
+        self.check_test_case(test_case, false)
+    }
+    
+    fn check_test_case(&mut self, test_case: &Vec<usize>, mark: bool) -> usize {
+        let mut weight = 0;
+
+        self.ca_map.iter_mut().enumerate().for_each(|(i, ca_row)| {
+            let test = self.comb_indices[i]
+                .iter()
+                .map(|&index| test_case[index].to_string())
+                .collect::<String>();
+            let decimal_number = usize::from_str_radix(&test, self.p_values as u32).unwrap() as usize;
+            
+            if ca_row[decimal_number] == 0 {
+                if mark {
+                    ca_row[decimal_number] = if self.print_map {self.size as usize + 1} else {1};
+                }
+                weight += 1;
+            }
+        });
+        
+        weight
     }
 }
 
