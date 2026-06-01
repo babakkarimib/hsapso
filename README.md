@@ -1,5 +1,8 @@
-Generating minimum covering array (CA) by combining novel approaches to Harmony Search Algorithm and PSO implemented in Rust programming language.<br>
-More info on the subject matter: https://ieeexplore.ieee.org/document/9729719
+HSAPSO is a hybrid metaheuristic optimization framework that combines novel approaches from the Harmony Search Algorithm (HS) and Particle Swarm Optimization (PSO) for minimum Covering Array (CA) generation in combinatorial software testing. The project is implemented in Rust and focuses on reducing test suite size while maintaining complete t-way interaction coverage.
+<br><br>
+More information on the subject:
+https://ieeexplore.ieee.org/document/9729719
+
 ### How to Compile & Run:
 - Install rust (Linux or macOS):<br>
 ```$ curl --proto '=https' --tlsv1.3 https://sh.rustup.rs -sSf | sh```
