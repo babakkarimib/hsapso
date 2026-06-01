@@ -1,4 +1,4 @@
-HSAPSO is a hybrid metaheuristic optimization framework that combines novel approaches from the Harmony Search Algorithm (HS) and Particle Swarm Optimization (PSO) for minimum Covering Array (CA) generation in combinatorial software testing. The project is implemented in Rust and focuses on reducing test suite size while maintaining complete t-way interaction coverage.
+HSAPSO is a hybrid metaheuristic optimization framework that combines novel approaches from the Harmony Search Algorithm (HSA) and Particle Swarm Optimization (PSO) for minimum Covering Array (CA) generation in combinatorial software testing. The project is implemented in Rust and focuses on reducing test suite size while maintaining complete t-way interaction coverage.
 <br><br>
 More information on the subject:
 https://ieeexplore.ieee.org/document/9729719
